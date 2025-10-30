@@ -10,7 +10,7 @@ def test_put_v1_account_login():
     login_api = LoginApi(host='http://5.63.153.31:5051')
     mailhog_api = MailhogApi(host='http://5.63.153.31:5025')
 
-    login = 'kirka_post_login_3'
+    login = 'kirka_post_login_4'
     email = f'{login}@mail.ru'
     password = 'qwerty123'
 
