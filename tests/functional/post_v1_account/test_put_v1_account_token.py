@@ -23,7 +23,7 @@ def test_put_v1_account_token():
     account_api = AccountApi(dm_api_configuration)
     mailhog_api = MailhogApi(mailhog_configuration)
 
-    login = 'kirka_put_token_9'
+    login = 'kirka_put_token_16'
     email = f'{login}@mail.ru'
     password = 'qwerty123'
 
