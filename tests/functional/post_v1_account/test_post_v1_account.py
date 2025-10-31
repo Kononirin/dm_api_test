@@ -1,5 +1,3 @@
-from json import loads
-
 import structlog
 
 from helpers.account_helper import AccountHelper
@@ -29,7 +27,7 @@ def test_post_v1_account():
 
     account_helper = AccountHelper(dm_account_api=account, mailhog=mailhog)
 
-    login = 'kirka_post_30'
+    login = 'kirka_post_32'
     email = f'{login}@mail.ru'
     password = 'qwerty123'
 

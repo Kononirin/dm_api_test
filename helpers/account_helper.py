@@ -31,6 +31,7 @@ class AccountHelper:
         response = self.mailhog.mailhog_api.get_api_v2_messages()
         assert response.status_code == 200, "Письма не были получены"
         token = self.get_activation_token_by_login(login=login, response=response)
+        print(token)
         assert token is not None, f"Токен для пользователя {login} не был получен"
         response = self.dm_account_api.account_api.put_v1_account_token(token=token)
         assert response.status_code == 200, "Пользователь не был активирован"
@@ -42,7 +43,7 @@ class AccountHelper:
             login: str,
             password: str,
             remember_me: bool = True
-            ):
+    ):
         # Авторизация пользователя
         json_data = {
             'login': login,
@@ -52,6 +53,43 @@ class AccountHelper:
 
         response = self.dm_account_api.login_api.post_v1_account_login(json_data=json_data)
         assert response.status_code == 200, "Пользователь не смог авторизоваться"
+
+        return response
+
+    def change_email(
+            self,
+            json_data
+    ):
+        response = self.dm_account_api.account_api.put_v1_account_email(json_data=json_data)
+        assert response.status_code == 200, "Имейл пользователя не изменён"
+
+    def recieve_token_for_new_user(
+            self,
+            login: str
+    ):
+        response = self.mailhog.mailhog_api.get_api_v2_messages()
+        assert response.status_code == 200, "Письма не были получены"
+        token = self.get_activation_token_by_login(login=login, response=response)
+        assert token is not None, f"Токен для пользователя {login} не был получен"
+        print(token)
+        response = self.dm_account_api.account_api.put_v1_account_token(token=token)
+        assert response.status_code == 200, "Пользователь не был активирован"
+
+    def user_login_with_wrong_email(
+            self,
+            login: str,
+            password: str,
+            remember_me: bool = True
+    ):
+        # Авторизация пользователя
+        json_data = {
+            'login': login,
+            'password': password,
+            'rememberMe': True,
+        }
+
+        response = self.dm_account_api.login_api.post_v1_account_login(json_data=json_data)
+        assert response.status_code == 403, "Пользователь смог авторизоваться"
 
         return response
 
