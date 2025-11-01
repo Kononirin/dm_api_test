@@ -27,9 +27,10 @@ def test_post_v1_account():
 
     account_helper = AccountHelper(dm_account_api=account, mailhog=mailhog)
 
-    login = 'kirka_post_32'
+    login = 'kirka_post_37'
     email = f'{login}@mail.ru'
     password = 'qwerty123'
 
     account_helper.register_new_user(login=login, password=password, email=email)
-    account_helper.user_login(login=login, password=password)
+    response = account_helper.user_login(login=login, password=password)
+    assert response.status_code == 200, "Пользователь не смог авторизоваться"

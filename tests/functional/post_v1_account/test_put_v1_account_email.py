@@ -25,7 +25,7 @@ def test_put_v1_account_email():
 
     account_helper = AccountHelper(dm_account_api=account, mailhog=mailhog)
 
-    login = 'kirka_put_email_24'
+    login = 'kirka_put_email_29'
     email = f'{login}@mail.ru'
     password = 'qwerty123'
 
@@ -36,8 +36,11 @@ def test_put_v1_account_email():
     }
 
     account_helper.register_new_user(login=login, password=password, email=email)
-    account_helper.user_login(login=login, password=password)
+    response = account_helper.user_login(login=login, password=password)
+    assert response.status_code == 200, "Пользователь не смог авторизоваться"
     account_helper.change_email(json_data=json_data)
-    account_helper.user_login_with_wrong_email(login=login, password=password)
-    account_helper.recieve_token_for_new_user(login=login)
+    response = account_helper.user_login(login=login, password=password)
+    assert response.status_code == 403, "Пользователь авторизовался"
+    token = account_helper.get_mails_and_activation_token_by_login(login=login)
+    account_helper.activate_user_by_token(token)
     account_helper.user_login(login=login, password=password)
