@@ -25,7 +25,7 @@ def test_post_v1_account_login():
 
     account_helper = AccountHelper(dm_account_api=account, mailhog=mailhog)
 
-    login = 'kirka_post_login_23'
+    login = 'kirka_post_login_24'
     email = f'{login}@mail.ru'
     password = 'qwerty123'
 
