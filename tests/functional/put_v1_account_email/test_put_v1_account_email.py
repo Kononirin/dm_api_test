@@ -1,33 +1,11 @@
-import structlog
+def test_put_v1_account_email(
+        account_helper,
+        prepare_user
+        ):
 
-from helpers.account_helper import AccountHelper
-from restclient.configuration import Configuration as MailhogConfiguration
-from restclient.configuration import Configuration as DmApiConfiguration
-from services.dm_api_account import DMApiAccount
-from services.api_mailhog import MailHogApi
-
-structlog.configure(
-    processors=[
-        structlog.processors.JSONRenderer(
-            indent=4,
-            ensure_ascii=True,
-            # sort_keys=True
-        )
-    ]
-)
-
-def test_put_v1_account_email():
-    dm_api_configuration = DmApiConfiguration(host='http://5.63.153.31:5051', disable_log=False)
-    mailhog_configuration = MailhogConfiguration(host='http://5.63.153.31:5025')
-
-    account = DMApiAccount(configuration=dm_api_configuration)
-    mailhog = MailHogApi(configuration=mailhog_configuration)
-
-    account_helper = AccountHelper(dm_account_api=account, mailhog=mailhog)
-
-    login = 'kirka_put_email_34'
-    email = f'{login}@mail.ru'
-    password = 'qwerty123'
+    login = prepare_user.login
+    password = prepare_user.password
+    email = prepare_user.email
 
     json_data = {
         'login': login,

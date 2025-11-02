@@ -20,7 +20,6 @@ def retrier(
             if count == 5:
                 raise AssertionError("Превышено количество попыток получения активацонного токена")
             if token:
-
                 return token
             time.sleep(1)
 
@@ -36,6 +35,23 @@ class AccountHelper:
     ):
         self.dm_account_api = dm_account_api
         self.mailhog = mailhog
+
+    def auth_client(
+            self,
+            login: str,
+            password: str
+    ):
+        response = self.dm_account_api.login_api.post_v1_account_login(
+            json_data={
+                'login': login,
+                'password': password
+            }
+        )
+        token = {
+            "x-dm-auth-token": response.headers["x-dm-auth-token"]
+        }
+        self.dm_account_api.account_api.set_headers(token)
+        self.dm_account_api.login_api.set_headers(token)
 
     def register_new_user(
             self,
@@ -85,7 +101,7 @@ class AccountHelper:
     def activate_user_by_token(
             self,
             token
-            ):
+    ):
         response = self.dm_account_api.account_api.put_v1_account_token(token=token)
         assert response.status_code == 200, "Пользователь не был активирован"
 
