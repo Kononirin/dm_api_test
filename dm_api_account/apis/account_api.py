@@ -73,3 +73,19 @@ class AccountApi(RestClient):
         )
 
         return response
+
+    def put_v1_account_password(
+            self,
+            json_data,
+            **kwargs
+    ):
+        """
+        Change registered user password
+        :return:
+        """
+        response = self.put(
+            path=f'/v1/account/password',
+            json=json_data,
+            **kwargs
+        )
+        return response
