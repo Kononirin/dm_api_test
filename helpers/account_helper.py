@@ -1,5 +1,6 @@
 import time
 from json import loads
+from pprint import pprint
 
 from services.dm_api_account import DMApiAccount
 from services.api_mailhog import MailHogApi
@@ -27,7 +28,6 @@ def retrier(
 
 
 class AccountHelper:
-    # Регистрация пользователя
     def __init__(
             self,
             dm_account_api: DMApiAccount,
@@ -56,23 +56,29 @@ class AccountHelper:
     def change_password(
             self,
             login: str,
-            oldPassword: str,
-            newPassword: str
+            email: str,
+            old_password: str,
+            new_password: str
     ):
-        json_data = {
-            'login': login,
-            'oldPassword': oldPassword,
-            'newPassword': newPassword
-        }
-
-        response = self.dm_account_api.account_api.put_v1_account_password(json_data=json_data)
-        # token = {
-        #     "x-dm-auth-token": response.headers["x-dm-auth-token"]
-        # }
-        # self.dm_account_api.account_api.set_headers(token)
-        # self.dm_account_api.login_api.set_headers(token)
-
-
+        token = self.user_login(login=login, password=old_password)
+        self.dm_account_api.account_api.post_v1_account_password(
+            json_data={
+                "login": login,
+                "email": email
+            },
+            headers={
+                "x-dm-auth-token": token.headers["x-dm-auth-token"]
+            }
+        )
+        token = self.get_reset_token_by_login(login=login)
+        self.dm_account_api.account_api.put_v1_account_password(
+            json_data={
+                "login": login,
+                "oldPassword": old_password,
+                "newPassword": new_password,
+                "token": token
+            }
+        )
 
     def register_new_user(
             self,
@@ -141,4 +147,24 @@ class AccountHelper:
             user_login = user_data['Login']
             if user_login == login:
                 token = user_data['ConfirmationLinkUrl'].split('/')[-1]
+        return token
+
+    @retrier
+    def get_reset_token_by_login(
+            self,
+            login
+    ):
+        token = None
+        response = self.mailhog.mailhog_api.get_api_v2_messages()
+        assert response.status_code == 200, "Письма не были получены"
+
+        for item in response.json()['items']:
+            user_data = loads(item['Content']['Body'])
+            user_login = user_data['Login']
+
+            if user_login == login:
+                # Проверяем наличие ключа
+                if 'ConfirmationLinkUri' in user_data:
+                    token = user_data['ConfirmationLinkUri'].split('/')[-1]
+                    break
         return token

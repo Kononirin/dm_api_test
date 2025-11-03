@@ -1,6 +1,6 @@
 from requests import (
     session,
-    JSONDecodeError
+    JSONDecodeError,
 )
 import structlog
 import uuid
@@ -20,7 +20,10 @@ class RestClient:
         self.session = session()
         self.log = structlog.get_logger(__name__).bind(service='api')
 
-    def  set_headers(self, headers):
+    def set_headers(
+            self,
+            headers
+            ):
         if headers:
             self.session.headers.update(headers)
 
