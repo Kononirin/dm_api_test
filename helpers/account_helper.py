@@ -1,6 +1,5 @@
 import time
 from json import loads
-from pprint import pprint
 
 from services.dm_api_account import DMApiAccount
 from services.api_mailhog import MailHogApi
@@ -109,7 +108,7 @@ class AccountHelper:
         json_data = {
             'login': login,
             'password': password,
-            'rememberMe': remember_me,
+            'rememberMe': True,
         }
 
         response = self.dm_account_api.login_api.post_v1_account_login(json_data=json_data)

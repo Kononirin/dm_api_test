@@ -62,7 +62,7 @@ def auth_account_helper(
     return account_helper
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def prepare_user():
     now = datetime.now()
     data = now.strftime("%d_%m_%Y_%H_%M_%S")
