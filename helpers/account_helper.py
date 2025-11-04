@@ -40,6 +40,7 @@ class AccountHelper:
             login: str,
             password: str
     ):
+
         response = self.user_login(login=login, password=password)
         token = {
             "x-dm-auth-token": response.headers["x-dm-auth-token"]
