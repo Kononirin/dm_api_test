@@ -1,6 +1,8 @@
 import time
 from json import loads
 
+from dm_api_account.models.login_credentials import LoginCredentials
+from dm_api_account.models.registration import Registration
 from services.dm_api_account import DMApiAccount
 from services.api_mailhog import MailHogApi
 
@@ -24,6 +26,7 @@ def retrier(
             time.sleep(1)
 
     return wrapper
+
 
 
 class AccountHelper:
@@ -85,18 +88,20 @@ class AccountHelper:
             password: str,
             email: str
     ):
-        json_data = {
-            'login': login,
-            'email': email,
-            'password': password,
-        }
+        registration = Registration(
+            login=login,
+            email=email,
+            password=password,
+        )
 
-        response = self.dm_account_api.account_api.post_v1_account(json_data=json_data)
-        assert response.status_code == 201, "Пользователь не был создан"
+        response = self.dm_account_api.account_api.post_v1_account(registration=registration)
+        assert (response.status_code == 201), f"Пользователь не был создан {response.json()}"
+        start_time = time.time()
         token = self.get_token_by_login(login=login)
+        end_time = time.time()
+        assert end_time - start_time < 3, "Время ожидания активации токена превышено"
         assert token is not None, f"Токен для пользователя {login} не был получен"
-        response = self.activate_user_by_token(token)
-        assert response.status_code == 200, "Пользователь не был активирован"
+        response = self.activate_user_by_token(token=token)
 
         return response
 
@@ -111,17 +116,22 @@ class AccountHelper:
             self,
             login: str,
             password: str,
-            remember_me: bool = True
+            remember_me: bool = True,
+            validate_response=True
     ):
         # Авторизация пользователя
-        json_data = {
-            'login': login,
-            'password': password,
-            'rememberMe': True,
-        }
+        login_credentials = LoginCredentials(
+            login=login,
+            password=password,
+            remember_me=remember_me,
+        )
 
-        response = self.dm_account_api.login_api.post_v1_account_login(json_data=json_data)
-
+        response = self.dm_account_api.login_api.post_v1_account_login(
+            login_credentials=login_credentials,
+            validate_response=validate_response
+        )
+        assert response.headers["x-dm-auth-token"], "Токен для пользователя не был получен"
+        assert response.status_code == 200, "Пользователь не смог авторизоваться"
         return response
 
     def change_email(
