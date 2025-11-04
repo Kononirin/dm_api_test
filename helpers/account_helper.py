@@ -101,6 +101,13 @@ class AccountHelper:
 
         return response
 
+    def get_account_info(
+            self
+            ):
+        response = self.dm_account_api.account_api.get_v1_account()
+
+        return response
+
     def user_login(
             self,
             login: str,
@@ -156,3 +163,17 @@ class AccountHelper:
                     token = user_data['ConfirmationLinkUrl'].split('/')[-1]
                     break
         return token
+
+    def user_logout(
+            self
+            ):
+        response = self.dm_account_api.login_api.delete_v1_account_login()
+
+        return response
+
+    def user_logout_from_all_devices(
+            self
+            ):
+        response = self.dm_account_api.login_api.delete_v1_account_login_all()
+
+        return response
