@@ -20,7 +20,6 @@ def retrier(
             if count == 5:
                 raise AssertionError("Превышено количество попыток получения активацонного токена")
             if token:
-
                 return token
             time.sleep(1)
 
@@ -28,7 +27,6 @@ def retrier(
 
 
 class AccountHelper:
-    # Регистрация пользователя
     def __init__(
             self,
             dm_account_api: DMApiAccount,
@@ -36,6 +34,50 @@ class AccountHelper:
     ):
         self.dm_account_api = dm_account_api
         self.mailhog = mailhog
+
+    def auth_client(
+            self,
+            login: str,
+            password: str
+    ):
+        response = self.dm_account_api.login_api.post_v1_account_login(
+            json_data={
+                'login': login,
+                'password': password
+            }
+        )
+        token = {
+            "x-dm-auth-token": response.headers["x-dm-auth-token"]
+        }
+        self.dm_account_api.account_api.set_headers(token)
+        self.dm_account_api.login_api.set_headers(token)
+
+    def change_password(
+            self,
+            login: str,
+            email: str,
+            old_password: str,
+            new_password: str
+    ):
+        token = self.user_login(login=login, password=old_password)
+        self.dm_account_api.account_api.post_v1_account_password(
+            json_data={
+                "login": login,
+                "email": email
+            },
+            headers={
+                "x-dm-auth-token": token.headers["x-dm-auth-token"]
+            }
+        )
+        token = self.get_token_by_login(login=login)
+        self.dm_account_api.account_api.put_v1_account_password(
+            json_data={
+                "login": login,
+                "oldPassword": old_password,
+                "newPassword": new_password,
+                "token": token
+            }
+        )
 
     def register_new_user(
             self,
@@ -51,10 +93,17 @@ class AccountHelper:
 
         response = self.dm_account_api.account_api.post_v1_account(json_data=json_data)
         assert response.status_code == 201, "Пользователь не был создан"
-        token = self.get_mails_and_activation_token_by_login(login=login)
+        token = self.get_token_by_login(login=login)
         assert token is not None, f"Токен для пользователя {login} не был получен"
         response = self.activate_user_by_token(token)
         assert response.status_code == 200, "Пользователь не был активирован"
+
+        return response
+
+    def get_account_info(
+            self
+            ):
+        response = self.dm_account_api.account_api.get_v1_account()
 
         return response
 
@@ -85,23 +134,45 @@ class AccountHelper:
     def activate_user_by_token(
             self,
             token
-            ):
+    ):
         response = self.dm_account_api.account_api.put_v1_account_token(token=token)
         assert response.status_code == 200, "Пользователь не был активирован"
 
         return response
 
     @retrier
-    def get_mails_and_activation_token_by_login(
+    def get_token_by_login(
             self,
             login
     ):
         token = None
         response = self.mailhog.mailhog_api.get_api_v2_messages()
         assert response.status_code == 200, "Письма не были получены"
+
         for item in response.json()['items']:
-            user_data = (loads(item['Content']['Body']))
+            user_data = loads(item['Content']['Body'])
             user_login = user_data['Login']
+
             if user_login == login:
-                token = user_data['ConfirmationLinkUrl'].split('/')[-1]
+                # Проверяем наличие ключа
+                if 'ConfirmationLinkUri' in user_data:
+                    token = user_data['ConfirmationLinkUri'].split('/')[-1]
+                    break
+                elif 'ConfirmationLinkUrl' in user_data:
+                    token = user_data['ConfirmationLinkUrl'].split('/')[-1]
+                    break
         return token
+
+    def user_logout(
+            self
+            ):
+        response = self.dm_account_api.login_api.delete_v1_account_login()
+
+        return response
+
+    def user_logout_from_all_devices(
+            self
+            ):
+        response = self.dm_account_api.login_api.delete_v1_account_login_all()
+
+        return response
