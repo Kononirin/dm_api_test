@@ -1,5 +1,7 @@
+import random
 from collections import namedtuple
 from datetime import datetime
+
 
 import pytest
 import structlog
@@ -66,7 +68,8 @@ def auth_account_helper(
 def prepare_user():
     now = datetime.now()
     data = now.strftime("%d_%m_%Y_%H_%M_%S")
-    login = f'kirka_post_{data}'
+    random_int = random.randint(1, 100)
+    login = f'kirka_post_{data}_{random_int}'
     password = 'qwerty123'
     email = f'{login}@mail.ru'
     User = namedtuple("User", ["login", "password", "email"])

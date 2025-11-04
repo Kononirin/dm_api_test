@@ -70,7 +70,7 @@ class AccountHelper:
                 "x-dm-auth-token": token.headers["x-dm-auth-token"]
             }
         )
-        token = self.get_reset_token_by_login(login=login)
+        token = self.get_token_by_login(login=login)
         self.dm_account_api.account_api.put_v1_account_password(
             json_data={
                 "login": login,
@@ -94,7 +94,7 @@ class AccountHelper:
 
         response = self.dm_account_api.account_api.post_v1_account(json_data=json_data)
         assert response.status_code == 201, "Пользователь не был создан"
-        token = self.get_mails_and_activation_token_by_login(login=login)
+        token = self.get_token_by_login(login=login)
         assert token is not None, f"Токен для пользователя {login} не был получен"
         response = self.activate_user_by_token(token)
         assert response.status_code == 200, "Пользователь не был активирован"
@@ -135,22 +135,7 @@ class AccountHelper:
         return response
 
     @retrier
-    def get_mails_and_activation_token_by_login(
-            self,
-            login
-    ):
-        token = None
-        response = self.mailhog.mailhog_api.get_api_v2_messages()
-        assert response.status_code == 200, "Письма не были получены"
-        for item in response.json()['items']:
-            user_data = (loads(item['Content']['Body']))
-            user_login = user_data['Login']
-            if user_login == login:
-                token = user_data['ConfirmationLinkUrl'].split('/')[-1]
-        return token
-
-    @retrier
-    def get_reset_token_by_login(
+    def get_token_by_login(
             self,
             login
     ):
@@ -166,5 +151,8 @@ class AccountHelper:
                 # Проверяем наличие ключа
                 if 'ConfirmationLinkUri' in user_data:
                     token = user_data['ConfirmationLinkUri'].split('/')[-1]
+                    break
+                elif 'ConfirmationLinkUrl' in user_data:
+                    token = user_data['ConfirmationLinkUrl'].split('/')[-1]
                     break
         return token
