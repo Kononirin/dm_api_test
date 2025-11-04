@@ -1,5 +1,6 @@
 import requests
 
+from dm_api_account.models import registration
 from dm_api_account.models.registration import Registration
 from dm_api_account.models.user_envelope import UserEnvelope
 from restclient.client import RestClient
@@ -9,16 +10,45 @@ class AccountApi(RestClient):
 
     def post_v1_account(
             self,
-            registration: Registration
+            json_data
     ):
         """
         Register new user
-        :param registration:
+        :param json_data:
         :return:
         """
         response = self.post(
             path=f'/v1/account',
             json=registration.model_dump(exclude_none=True, by_alias=True)
+        )
+        return response
+
+    def get_v1_account(
+            self,
+            **kwargs
+    ):
+        """
+        Get current user
+        :return:
+        """
+        response = self.get(
+            path=f'/v1/account',
+            **kwargs,
+            json=registration.model_dump(exclude_none=True, by_alias=True)
+        )
+        return response
+
+    def get_v1_account(
+            self,
+            **kwargs
+    ):
+        """
+        Get current user
+        :return:
+        """
+        response = self.get(
+            path=f'/v1/account',
+            **kwargs
         )
         return response
 

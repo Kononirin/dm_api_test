@@ -68,7 +68,7 @@ class AccountHelper:
                 "x-dm-auth-token": token.headers["x-dm-auth-token"]
             }
         )
-        token = self.get_reset_token_by_login(login=login)
+        token = self.get_token_by_login(login=login)
         self.dm_account_api.account_api.put_v1_account_password(
             json_data={
                 "login": login,
@@ -93,11 +93,18 @@ class AccountHelper:
         response = self.dm_account_api.account_api.post_v1_account(registration=registration)
         assert (response.status_code == 201), f"Пользователь не был создан {response.json()}"
         start_time = time.time()
-        token = self.get_mails_and_activation_token_by_login(login=login)
+        token = self.get_token_by_login(login=login)
         end_time = time.time()
         assert end_time - start_time < 3, "Время ожидания активации токена превышено"
         assert token is not None, f"Токен для пользователя {login} не был получен"
         response = self.activate_user_by_token(token=token)
+
+        return response
+
+    def get_account_info(
+            self
+            ):
+        response = self.dm_account_api.account_api.get_v1_account()
 
         return response
 
@@ -140,22 +147,7 @@ class AccountHelper:
         return response
 
     @retrier
-    def get_mails_and_activation_token_by_login(
-            self,
-            login
-    ):
-        token = None
-        response = self.mailhog.mailhog_api.get_api_v2_messages()
-        assert response.status_code == 200, "Письма не были получены"
-        for item in response.json()['items']:
-            user_data = (loads(item['Content']['Body']))
-            user_login = user_data['Login']
-            if user_login == login:
-                token = user_data['ConfirmationLinkUrl'].split('/')[-1]
-        return token
-
-    @retrier
-    def get_reset_token_by_login(
+    def get_token_by_login(
             self,
             login
     ):
@@ -172,4 +164,21 @@ class AccountHelper:
                 if 'ConfirmationLinkUri' in user_data:
                     token = user_data['ConfirmationLinkUri'].split('/')[-1]
                     break
+                elif 'ConfirmationLinkUrl' in user_data:
+                    token = user_data['ConfirmationLinkUrl'].split('/')[-1]
+                    break
         return token
+
+    def user_logout(
+            self
+            ):
+        response = self.dm_account_api.login_api.delete_v1_account_login()
+
+        return response
+
+    def user_logout_from_all_devices(
+            self
+            ):
+        response = self.dm_account_api.login_api.delete_v1_account_login_all()
+
+        return response
