@@ -1,5 +1,6 @@
 import requests
 
+from dm_api_account.models.change_email import ChangeEmail
 from dm_api_account.models.change_password import ChangePassword
 from dm_api_account.models.registration import Registration
 from dm_api_account.models.reset_password import ResetPassword
@@ -64,7 +65,7 @@ class AccountApi(RestClient):
 
     def put_v1_account_email(
             self,
-            json_data
+            change_email: ChangeEmail
     ):
         """
         Change registered user email
@@ -79,9 +80,8 @@ class AccountApi(RestClient):
         response = self.put(
             path=f'/v1/account/email',
             headers=headers,
-            json=json_data
+            json=change_email.model_dump(exclude_none=True, by_alias=True)
         )
-
         return response
 
     def post_v1_account_password(

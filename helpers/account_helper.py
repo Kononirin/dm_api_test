@@ -1,6 +1,7 @@
 import time
 from json import loads
 
+from dm_api_account.models.change_email import ChangeEmail
 from dm_api_account.models.change_password import ChangePassword
 from dm_api_account.models.login_credentials import LoginCredentials
 from dm_api_account.models.registration import Registration
@@ -135,11 +136,18 @@ class AccountHelper:
         # assert response.status_code == 200, "Пользователь не смог авторизоваться"
         return response
 
-    def change_email(
+    def change_user_email(
             self,
-            json_data
+            login,
+            password,
+            email
     ):
-        response = self.dm_account_api.account_api.put_v1_account_email(json_data=json_data)
+        change_email = ChangeEmail(
+            login=login,
+            password=password,
+            email=email
+        )
+        response = self.dm_account_api.account_api.put_v1_account_email(change_email=change_email)
         assert response.status_code == 200, "Имейл пользователя не изменён"
 
     def activate_user_by_token(
