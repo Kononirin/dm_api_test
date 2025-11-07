@@ -1,7 +1,7 @@
 import requests
 
-from dm_api_account.models import registration
 from dm_api_account.models.registration import Registration
+from dm_api_account.models.reset_password import ResetPassword
 from dm_api_account.models.user_envelope import UserEnvelope
 from restclient.client import RestClient
 
@@ -39,34 +39,6 @@ class AccountApi(RestClient):
         )
         # UserEnvelope(**response.json())
         return response
-
-    # def get_v1_account(
-    #         self,
-    #         **kwargs
-    # ):
-    #     """
-    #     Get current user
-    #     :return:
-    #     """
-    #     response = self.get(
-    #         path=f'/v1/account',
-    #         **kwargs
-    #     )
-    #     return response
-    #
-    # def get_v1_account(
-    #         self,
-    #         **kwargs
-    # ):
-    #     """
-    #     Get current user
-    #     :return:
-    #     """
-    #     response = self.get(
-    #         path=f'/v1/account',
-    #         **kwargs
-    #     )
-    #     return response
 
     def put_v1_account_token(
             self,
@@ -113,7 +85,8 @@ class AccountApi(RestClient):
 
     def post_v1_account_password(
             self,
-            json_data,
+            # json_data,
+            reset_password: ResetPassword,
             **kwargs
     ):
         """
@@ -122,7 +95,7 @@ class AccountApi(RestClient):
         """
         response = self.post(
             path=f'/v1/account/password',
-            json=json_data,
+            json=reset_password.model_dump(exclude_none=True, by_alias=True),
             **kwargs
         )
         return response

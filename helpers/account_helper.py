@@ -3,6 +3,7 @@ from json import loads
 
 from dm_api_account.models.login_credentials import LoginCredentials
 from dm_api_account.models.registration import Registration
+from dm_api_account.models.reset_password import ResetPassword
 from services.dm_api_account import DMApiAccount
 from services.api_mailhog import MailHogApi
 
@@ -58,12 +59,12 @@ class AccountHelper:
             old_password: str,
             new_password: str
     ):
+        reset_password = ResetPassword(
+            login=login,
+            email=email
+        )
         token = self.user_login(login=login, password=old_password)
-        self.dm_account_api.account_api.post_v1_account_password(
-            json_data={
-                "login": login,
-                "email": email
-            },
+        self.dm_account_api.account_api.post_v1_account_password(reset_password=reset_password,
             headers={
                 "x-dm-auth-token": token.headers["x-dm-auth-token"]
             }
