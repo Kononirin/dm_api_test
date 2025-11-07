@@ -1,6 +1,7 @@
 import time
 from json import loads
 
+from dm_api_account.models.change_password import ChangePassword
 from dm_api_account.models.login_credentials import LoginCredentials
 from dm_api_account.models.registration import Registration
 from dm_api_account.models.reset_password import ResetPassword
@@ -63,6 +64,7 @@ class AccountHelper:
             login=login,
             email=email
         )
+
         token = self.user_login(login=login, password=old_password)
         self.dm_account_api.account_api.post_v1_account_password(reset_password=reset_password,
             headers={
@@ -70,14 +72,15 @@ class AccountHelper:
             }
         )
         token = self.get_token_by_login(login=login)
-        self.dm_account_api.account_api.put_v1_account_password(
-            json_data={
-                "login": login,
-                "oldPassword": old_password,
-                "newPassword": new_password,
-                "token": token
-            }
+
+        change_password = ChangePassword(
+            login=login,
+            token=token,
+            old_password=old_password,
+            new_password=new_password
         )
+
+        self.dm_account_api.account_api.put_v1_account_password(change_password=change_password)
 
     def register_new_user(
             self,

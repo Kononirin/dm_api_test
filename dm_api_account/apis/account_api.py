@@ -1,5 +1,6 @@
 import requests
 
+from dm_api_account.models.change_password import ChangePassword
 from dm_api_account.models.registration import Registration
 from dm_api_account.models.reset_password import ResetPassword
 from dm_api_account.models.user_envelope import UserEnvelope
@@ -102,7 +103,7 @@ class AccountApi(RestClient):
 
     def put_v1_account_password(
             self,
-            json_data,
+            change_password: ChangePassword,
             **kwargs
     ):
         """
@@ -111,7 +112,7 @@ class AccountApi(RestClient):
         """
         response = self.put(
             path=f'/v1/account/password',
-            json=json_data,
+            json=change_password.model_dump(exclude_none=True, by_alias=True),
             **kwargs
         )
         return response
