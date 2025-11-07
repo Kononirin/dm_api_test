@@ -10,7 +10,7 @@ class AccountApi(RestClient):
 
     def post_v1_account(
             self,
-            json_data
+            registration: Registration
     ):
         """
         Register new user
@@ -26,6 +26,7 @@ class AccountApi(RestClient):
     def get_v1_account(
             self,
             **kwargs
+
     ):
         """
         Get current user
@@ -34,37 +35,38 @@ class AccountApi(RestClient):
         response = self.get(
             path=f'/v1/account',
             **kwargs,
-            json=registration.model_dump(exclude_none=True, by_alias=True)
+            # json=registration.model_dump(exclude_none=True, by_alias=True)
         )
+        # UserEnvelope(**response.json())
         return response
 
-    def get_v1_account(
-            self,
-            **kwargs
-    ):
-        """
-        Get current user
-        :return:
-        """
-        response = self.get(
-            path=f'/v1/account',
-            **kwargs
-        )
-        return response
-
-    def get_v1_account(
-            self,
-            **kwargs
-    ):
-        """
-        Get current user
-        :return:
-        """
-        response = self.get(
-            path=f'/v1/account',
-            **kwargs
-        )
-        return response
+    # def get_v1_account(
+    #         self,
+    #         **kwargs
+    # ):
+    #     """
+    #     Get current user
+    #     :return:
+    #     """
+    #     response = self.get(
+    #         path=f'/v1/account',
+    #         **kwargs
+    #     )
+    #     return response
+    #
+    # def get_v1_account(
+    #         self,
+    #         **kwargs
+    # ):
+    #     """
+    #     Get current user
+    #     :return:
+    #     """
+    #     response = self.get(
+    #         path=f'/v1/account',
+    #         **kwargs
+    #     )
+    #     return response
 
     def put_v1_account_token(
             self,
