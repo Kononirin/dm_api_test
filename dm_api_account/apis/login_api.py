@@ -14,7 +14,8 @@ class LoginApi(RestClient):
     ):
         """
         Authenticate via credentials
-        :param json_data:
+        :param validate_response:
+        :param login_credentials:
         :return:
         """
         response = self.post(
@@ -23,6 +24,7 @@ class LoginApi(RestClient):
         )
         if validate_response:
             return UserEnvelope(**response.json())
+
         return response
 
     def delete_v1_account_login(
@@ -37,6 +39,7 @@ class LoginApi(RestClient):
             path=f'/v1/account/login',
             **kwargs
         )
+
         return response
 
     def delete_v1_account_login_all(
@@ -51,32 +54,5 @@ class LoginApi(RestClient):
             path=f'/v1/account/login/all',
             **kwargs
         )
-        return response
 
-    # def delete_v1_account_login(
-    #         self,
-    #         **kwargs
-    # ):
-    #     """
-    #     Logout as current user
-    #     :return:
-    #     """
-    #     response = self.delete(
-    #         path=f'/v1/account/login',
-    #         **kwargs
-    #     )
-    #     return response
-    #
-    # def delete_v1_account_login_all(
-    #         self,
-    #         **kwargs
-    # ):
-    #     """
-    #     Logout from every device
-    #     :return:
-    #     """
-    #     response = self.delete(
-    #         path=f'/v1/account/login/all',
-    #         **kwargs
-    #     )
-    #     return response
+        return response

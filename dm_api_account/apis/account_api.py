@@ -4,6 +4,7 @@ from dm_api_account.models.change_email import ChangeEmail
 from dm_api_account.models.change_password import ChangePassword
 from dm_api_account.models.registration import Registration
 from dm_api_account.models.reset_password import ResetPassword
+from dm_api_account.models.user_details_envelope import UserDetailsEnvelope
 from dm_api_account.models.user_envelope import UserEnvelope
 from restclient.client import RestClient
 
@@ -16,30 +17,33 @@ class AccountApi(RestClient):
     ):
         """
         Register new user
-        :param json_data:
+        :param registration:
         :return:
         """
         response = self.post(
             path=f'/v1/account',
             json=registration.model_dump(exclude_none=True, by_alias=True)
         )
+
         return response
 
     def get_v1_account(
             self,
+            validate_response=True,
             **kwargs
-
     ):
         """
         Get current user
+        :param validate_response:
         :return:
         """
         response = self.get(
             path=f'/v1/account',
             **kwargs,
-            # json=registration.model_dump(exclude_none=True, by_alias=True)
         )
-        # UserEnvelope(**response.json())
+        if validate_response:
+            return UserDetailsEnvelope(**response.json())
+
         return response
 
     def put_v1_account_token(
@@ -49,6 +53,7 @@ class AccountApi(RestClient):
     ):
         """
         Activate registered user
+        :param validate_response:
         :param token:
         :return:
         """
@@ -61,6 +66,7 @@ class AccountApi(RestClient):
         )
         if validate_response:
             return UserEnvelope(**response.json())
+
         return response
 
     def put_v1_account_email(
@@ -69,7 +75,7 @@ class AccountApi(RestClient):
     ):
         """
         Change registered user email
-        :param json_data:
+        :param change_email:
         :return:
         """
 
@@ -82,16 +88,17 @@ class AccountApi(RestClient):
             headers=headers,
             json=change_email.model_dump(exclude_none=True, by_alias=True)
         )
+
         return response
 
     def post_v1_account_password(
             self,
-            # json_data,
             reset_password: ResetPassword,
             **kwargs
     ):
         """
         Reset registered user password
+        :param reset_password:
         :return:
         """
         response = self.post(
@@ -99,6 +106,7 @@ class AccountApi(RestClient):
             json=reset_password.model_dump(exclude_none=True, by_alias=True),
             **kwargs
         )
+
         return response
 
     def put_v1_account_password(
@@ -115,4 +123,5 @@ class AccountApi(RestClient):
             json=change_password.model_dump(exclude_none=True, by_alias=True),
             **kwargs
         )
+
         return response

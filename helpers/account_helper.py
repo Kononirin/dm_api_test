@@ -31,7 +31,6 @@ def retrier(
     return wrapper
 
 
-
 class AccountHelper:
     def __init__(
             self,
@@ -67,11 +66,12 @@ class AccountHelper:
         )
 
         token = self.user_login(login=login, password=old_password)
-        self.dm_account_api.account_api.post_v1_account_password(reset_password=reset_password,
+        self.dm_account_api.account_api.post_v1_account_password(
+            reset_password=reset_password,
             headers={
                 "x-dm-auth-token": token.headers["x-dm-auth-token"]
             }
-        )
+            )
         token = self.get_token_by_login(login=login)
 
         change_password = ChangePassword(
@@ -103,14 +103,14 @@ class AccountHelper:
         assert end_time - start_time < 3, "Время ожидания активации токена превышено"
         assert token is not None, f"Токен для пользователя {login} не был получен"
         response = self.activate_user_by_token(token=token)
-        # assert response.status_code == 200, "Пользователь не был активирован" # временно выключили
 
         return response
 
     def get_account_info(
-            self
-            ):
-        response = self.dm_account_api.account_api.get_v1_account()
+            self,
+            validate_response=False
+    ):
+        response = self.dm_account_api.account_api.get_v1_account(validate_response=validate_response)
 
         return response
 
@@ -132,8 +132,7 @@ class AccountHelper:
             login_credentials=login_credentials,
             validate_response=validate_response
         )
-        # assert response.headers["x-dm-auth-token"], "Токен для пользователя не был получен"
-        # assert response.status_code == 200, "Пользователь не смог авторизоваться"
+
         return response
 
     def change_user_email(
@@ -155,7 +154,6 @@ class AccountHelper:
             token
     ):
         response = self.dm_account_api.account_api.put_v1_account_token(token=token)
-        # assert response.status_code == 200, "Пользователь не был активирован"
 
         return response
 
@@ -180,18 +178,19 @@ class AccountHelper:
                 elif 'ConfirmationLinkUrl' in user_data:
                     token = user_data['ConfirmationLinkUrl'].split('/')[-1]
                     break
+
         return token
 
     def user_logout(
             self
-            ):
+    ):
         response = self.dm_account_api.login_api.delete_v1_account_login()
 
         return response
 
     def user_logout_from_all_devices(
             self
-            ):
+    ):
         response = self.dm_account_api.login_api.delete_v1_account_login_all()
 
         return response
