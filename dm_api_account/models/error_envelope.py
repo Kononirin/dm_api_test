@@ -3,6 +3,7 @@ from typing import Optional
 
 class ErrorEnvelope(BaseModel):
     """Модель для ошибок API"""
+
     status: int
     title: Optional[str] = None
     detail: Optional[str] = None
