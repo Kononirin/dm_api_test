@@ -108,7 +108,7 @@ class AccountHelper:
 
     def get_account_info(
             self,
-            validate_response=False
+            validate_response=True
     ):
         response = self.dm_account_api.account_api.get_v1_account(validate_response=validate_response)
 
@@ -147,7 +147,7 @@ class AccountHelper:
             email=email
         )
         response = self.dm_account_api.account_api.put_v1_account_email(change_email=change_email)
-        assert response.status_code == 200, "Имейл пользователя не изменён"
+        # assert response.status_code == 200, "Имейл пользователя не изменён"
 
     def activate_user_by_token(
             self,

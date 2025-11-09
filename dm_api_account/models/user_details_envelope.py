@@ -3,6 +3,9 @@ from enum import Enum
 from typing import (
     List,
     Optional,
+    Any,
+    Dict,
+    Union,
 )
 from pydantic import (
     BaseModel,
@@ -56,7 +59,7 @@ class Paging(BaseModel):
 
 class UserSettings(BaseModel):
     colorSchema: ColorSchema
-    nannyGreetingsMessage: str
+    nanny_greetings_message: str = Field(None, alias="nannyGreetingsMessage")
     paging: Paging
 
 
@@ -74,11 +77,11 @@ class UserDetails(BaseModel):
     icq: str = Field(None, alias="icq")
     skype: str = Field(None, alias="skype")
     original_picture_url: str = Field(None, alias="originalPictureUrl")
-    info: InfoBbText
+    info: Optional[Union[InfoBbText, str, Dict[str, Any]]] = None
     settings: UserSettings
 
 
 class UserDetailsEnvelope(BaseModel):
     model_config = ConfigDict(extra="forbid")
     resource: Optional[UserDetails] = None
-    metadata: str
+    metadata: Optional[Any] = None
