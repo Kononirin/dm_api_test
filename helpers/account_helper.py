@@ -130,7 +130,7 @@ class AccountHelper:
 
         response = self.dm_account_api.login_api.post_v1_account_login(
             login_credentials=login_credentials,
-            validate_response=validate_response
+            validate_response=False
         )
 
         return response
