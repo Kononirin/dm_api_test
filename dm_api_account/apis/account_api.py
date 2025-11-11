@@ -2,6 +2,7 @@ import requests
 
 from dm_api_account.models.change_email import ChangeEmail
 from dm_api_account.models.change_password import ChangePassword
+from dm_api_account.models.error_envelope import ErrorEnvelope
 from dm_api_account.models.registration import Registration
 from dm_api_account.models.reset_password import ResetPassword
 from dm_api_account.models.user_details_envelope import UserDetailsEnvelope
@@ -42,7 +43,12 @@ class AccountApi(RestClient):
             **kwargs,
         )
         if validate_response:
-            return UserDetailsEnvelope(**response.json())
+            data = response.json()
+
+            if response.status_code == 200:
+                return UserDetailsEnvelope(**data)
+            elif 400 <= response.status_code < 600:
+                return ErrorEnvelope(**data)
 
         return response
 
@@ -71,7 +77,8 @@ class AccountApi(RestClient):
 
     def put_v1_account_email(
             self,
-            change_email: ChangeEmail
+            change_email: ChangeEmail,
+            validate_response = True
     ):
         """
         Change registered user email
@@ -88,12 +95,15 @@ class AccountApi(RestClient):
             headers=headers,
             json=change_email.model_dump(exclude_none=True, by_alias=True)
         )
+        if validate_response:
+            return UserEnvelope(**response.json())
 
         return response
 
     def post_v1_account_password(
             self,
             reset_password: ResetPassword,
+            validate_response=True,
             **kwargs
     ):
         """
@@ -106,12 +116,15 @@ class AccountApi(RestClient):
             json=reset_password.model_dump(exclude_none=True, by_alias=True),
             **kwargs
         )
+        if validate_response:
+            return UserEnvelope(**response.json())
 
         return response
 
     def put_v1_account_password(
             self,
             change_password: ChangePassword,
+            validate_response=True,
             **kwargs
     ):
         """
@@ -123,5 +136,7 @@ class AccountApi(RestClient):
             json=change_password.model_dump(exclude_none=True, by_alias=True),
             **kwargs
         )
+        if validate_response:
+            return UserEnvelope(**response.json())
 
         return response
