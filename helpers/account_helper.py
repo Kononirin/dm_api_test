@@ -108,7 +108,7 @@ class AccountHelper:
 
     def get_account_info(
             self,
-            validate_response=False
+            validate_response=True
     ):
         response = self.dm_account_api.account_api.get_v1_account(validate_response=validate_response)
 
@@ -119,7 +119,7 @@ class AccountHelper:
             login: str,
             password: str,
             remember_me: bool = True,
-            validate_response=True
+            validate_response=False
     ):
         # Авторизация пользователя
         login_credentials = LoginCredentials(
@@ -130,7 +130,7 @@ class AccountHelper:
 
         response = self.dm_account_api.login_api.post_v1_account_login(
             login_credentials=login_credentials,
-            validate_response=False
+            validate_response=validate_response
         )
 
         return response
