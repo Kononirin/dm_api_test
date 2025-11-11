@@ -3,12 +3,12 @@ from enum import Enum
 from typing import (
     List,
     Optional,
-    Union
+    Union,
 )
 from pydantic import (
     BaseModel,
     Field,
-    ConfigDict
+    ConfigDict,
 )
 
 
