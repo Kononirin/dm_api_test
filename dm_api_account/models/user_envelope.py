@@ -1,8 +1,16 @@
-from __future__ import annotations
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
-from pydantic import (BaseModel, Field, ConfigDict)
+from typing import (
+    List,
+    Optional,
+    Dict,
+    Any,
+)
+from pydantic import (
+    BaseModel,
+    Field,
+    ConfigDict,
+)
 
 
 class UserRole(str, Enum):
@@ -29,11 +37,11 @@ class User(BaseModel):
     rating: Rating
     online: datetime = Field(None, alias="online")
     name: str = Field(None, alias="name")
-    location: str= Field(None, alias="location")
+    location: str = Field(None, alias="location")
     registration: datetime = Field(None, alias="registration")
 
 
 class UserEnvelope(BaseModel):
     model_config = ConfigDict(extra="forbid")
     resource: Optional[User] = None
-    metadata: Optional[str] = None
+    metadata: Optional[Any] = None

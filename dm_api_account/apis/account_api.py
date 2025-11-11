@@ -1,7 +1,11 @@
 import requests
 
-from dm_api_account.models import registration
+from dm_api_account.models.change_email import ChangeEmail
+from dm_api_account.models.change_password import ChangePassword
+from dm_api_account.models.error_envelope import ErrorEnvelope
 from dm_api_account.models.registration import Registration
+from dm_api_account.models.reset_password import ResetPassword
+from dm_api_account.models.user_details_envelope import UserDetailsEnvelope
 from dm_api_account.models.user_envelope import UserEnvelope
 from restclient.client import RestClient
 
@@ -10,60 +14,42 @@ class AccountApi(RestClient):
 
     def post_v1_account(
             self,
-            json_data
+            registration: Registration
     ):
         """
         Register new user
-        :param json_data:
+        :param registration:
         :return:
         """
         response = self.post(
             path=f'/v1/account',
             json=registration.model_dump(exclude_none=True, by_alias=True)
         )
+
         return response
 
     def get_v1_account(
             self,
+            validate_response=True,
             **kwargs
     ):
         """
         Get current user
+        :param validate_response:
         :return:
         """
         response = self.get(
             path=f'/v1/account',
             **kwargs,
-            json=registration.model_dump(exclude_none=True, by_alias=True)
         )
-        return response
+        if validate_response:
+            data = response.json()
 
-    def get_v1_account(
-            self,
-            **kwargs
-    ):
-        """
-        Get current user
-        :return:
-        """
-        response = self.get(
-            path=f'/v1/account',
-            **kwargs
-        )
-        return response
+            if response.status_code == 200:
+                return UserDetailsEnvelope(**data)
+            elif 400 <= response.status_code < 600:
+                return ErrorEnvelope(**data)
 
-    def get_v1_account(
-            self,
-            **kwargs
-    ):
-        """
-        Get current user
-        :return:
-        """
-        response = self.get(
-            path=f'/v1/account',
-            **kwargs
-        )
         return response
 
     def put_v1_account_token(
@@ -73,6 +59,7 @@ class AccountApi(RestClient):
     ):
         """
         Activate registered user
+        :param validate_response:
         :param token:
         :return:
         """
@@ -85,15 +72,17 @@ class AccountApi(RestClient):
         )
         if validate_response:
             return UserEnvelope(**response.json())
+
         return response
 
     def put_v1_account_email(
             self,
-            json_data
+            change_email: ChangeEmail,
+            validate_response = True
     ):
         """
         Change registered user email
-        :param json_data:
+        :param change_email:
         :return:
         """
 
@@ -104,30 +93,38 @@ class AccountApi(RestClient):
         response = self.put(
             path=f'/v1/account/email',
             headers=headers,
-            json=json_data
+            json=change_email.model_dump(exclude_none=True, by_alias=True)
         )
+        if validate_response:
+            return UserEnvelope(**response.json())
 
         return response
 
     def post_v1_account_password(
             self,
-            json_data,
+            reset_password: ResetPassword,
+            validate_response=True,
             **kwargs
     ):
         """
         Reset registered user password
+        :param reset_password:
         :return:
         """
         response = self.post(
             path=f'/v1/account/password',
-            json=json_data,
+            json=reset_password.model_dump(exclude_none=True, by_alias=True),
             **kwargs
         )
+        if validate_response:
+            return UserEnvelope(**response.json())
+
         return response
 
     def put_v1_account_password(
             self,
-            json_data,
+            change_password: ChangePassword,
+            validate_response=True,
             **kwargs
     ):
         """
@@ -136,7 +133,10 @@ class AccountApi(RestClient):
         """
         response = self.put(
             path=f'/v1/account/password',
-            json=json_data,
+            json=change_password.model_dump(exclude_none=True, by_alias=True),
             **kwargs
         )
+        if validate_response:
+            return UserEnvelope(**response.json())
+
         return response
