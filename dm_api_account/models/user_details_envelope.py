@@ -3,12 +3,14 @@ from enum import Enum
 from typing import (
     List,
     Optional,
-    Union
+    Any,
+    Dict,
+    Union,
 )
 from pydantic import (
     BaseModel,
     Field,
-    ConfigDict
+    ConfigDict,
 )
 
 
@@ -36,7 +38,7 @@ class BbParseMode(str, Enum):
 
 class InfoBbText(BaseModel):
     value: str = Field(None, alias="value")
-    parseMode: List[BbParseMode] = Field(default_factory=list)
+    parseMode: List[BbParseMode]
 
 
 class ColorSchema(str, Enum):
@@ -56,7 +58,7 @@ class Paging(BaseModel):
 
 
 class UserSettings(BaseModel):
-    color_schema: List[ColorSchema] = Field(None, serialization_alias='colorSchema')
+    colorSchema: ColorSchema
     nanny_greetings_message: str = Field(None, alias="nannyGreetingsMessage")
     paging: Paging
 
@@ -75,11 +77,11 @@ class UserDetails(BaseModel):
     icq: str = Field(None, alias="icq")
     skype: str = Field(None, alias="skype")
     original_picture_url: str = Field(None, alias="originalPictureUrl")
-    info: Optional[Union[InfoBbText, str]] = None
+    info: Optional[Union[InfoBbText, str, Dict[str, Any]]] = None
     settings: UserSettings
 
 
 class UserDetailsEnvelope(BaseModel):
     model_config = ConfigDict(extra="forbid")
     resource: Optional[UserDetails] = None
-    metadata: str = Field(None, alias="metadata")
+    metadata: Optional[Any] = None
