@@ -4,7 +4,6 @@ from datetime import datetime
 
 import pytest
 import structlog
-
 from vyper import v
 from pathlib import Path
 from helpers.account_helper import AccountHelper
