@@ -1,6 +1,8 @@
 import time
 from json import loads
 
+import allure
+
 from dm_api_account.models.change_email import ChangeEmail
 from dm_api_account.models.change_password import ChangePassword
 from dm_api_account.models.login_credentials import LoginCredentials
@@ -40,6 +42,7 @@ class AccountHelper:
         self.dm_account_api = dm_account_api
         self.mailhog = mailhog
 
+    @allure.step("Аутентификация")
     def auth_client(
             self,
             login: str,
@@ -53,6 +56,7 @@ class AccountHelper:
         self.dm_account_api.account_api.set_headers(token)
         self.dm_account_api.login_api.set_headers(token)
 
+    @allure.step("Изменение пароля пользователя")
     def change_password(
             self,
             login: str,
@@ -83,6 +87,7 @@ class AccountHelper:
 
         self.dm_account_api.account_api.put_v1_account_password(change_password=change_password)
 
+    @allure.step("Регистрация нового пользователя")
     def register_new_user(
             self,
             login: str,
@@ -106,6 +111,7 @@ class AccountHelper:
 
         return response
 
+    @allure.step("Получение информации о пользователе")
     def get_account_info(
             self,
             validate_response=True
@@ -114,6 +120,7 @@ class AccountHelper:
 
         return response
 
+    @allure.step("Аутентификация пользователя")
     def user_login(
             self,
             login: str,
@@ -135,6 +142,7 @@ class AccountHelper:
 
         return response
 
+    @allure.step("Изменение имейла пользователя")
     def change_user_email(
             self,
             login,
@@ -149,6 +157,7 @@ class AccountHelper:
         response = self.dm_account_api.account_api.put_v1_account_email(change_email=change_email)
         # assert response.status_code == 200, "Имейл пользователя не изменён"
 
+    @allure.step("Активация пользователя")
     def activate_user_by_token(
             self,
             token
@@ -157,6 +166,7 @@ class AccountHelper:
 
         return response
 
+    @allure.step("Получение токена")
     @retrier
     def get_token_by_login(
             self,
@@ -181,6 +191,7 @@ class AccountHelper:
 
         return token
 
+    @allure.step("Выход их системы пользователя")
     def user_logout(
             self
     ):
@@ -188,6 +199,7 @@ class AccountHelper:
 
         return response
 
+    @allure.step("Выход из системы со всех устройств")
     def user_logout_from_all_devices(
             self
     ):

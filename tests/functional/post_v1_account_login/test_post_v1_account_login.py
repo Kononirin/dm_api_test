@@ -1,3 +1,7 @@
+import allure
+
+
+@allure.title("Проверка регистрации нового пользователя по логину")
 def test_post_v1_account_login(
         account_helper,
         prepare_user

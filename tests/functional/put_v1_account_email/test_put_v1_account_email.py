@@ -1,6 +1,8 @@
+import allure
+
 from checkers.http_checkers import check_status_code_http
 
-
+@allure.title("Проверка изменения имейла пользователя")
 def test_put_v1_account_email(
         account_helper,
         prepare_user
