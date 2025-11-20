@@ -1,3 +1,4 @@
+import os
 import random
 from collections import namedtuple
 from datetime import datetime
@@ -25,7 +26,9 @@ options = (
     'service.dm_api_account',
     'service.mailhog',
     'user.login',
-    'user.password'
+    'user.password',
+    'telegram.chat_id',
+    'telegram.token'
 )
 
 @pytest.fixture(scope="session", autouse=True)
@@ -37,6 +40,8 @@ def set_config(request):
     v.read_in_config()
     for option in options:
         v.set(f"{option}", request.config.getoption(f"--{option}"))
+    os.environ["TELEGRAM_BOT_CHAT_ID"] = str(v.get("telegram.chat_id"))
+    os.environ["TELEGRAM_BOT_ACCESS_TOKEN"] = str(v.get("telegram.token"))
 
 
 def pytest_addoption(
