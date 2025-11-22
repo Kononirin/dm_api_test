@@ -30,7 +30,6 @@ requests==2.32.5
 rootpath==0.1.0
 six==1.17.0
 structlog==25.5.0
-swagger-coverage @ https://github.com/Kononirin/swagger-coverage-py/archive/refs/heads/master.zip#sha256=f33bdee41b0b618d6d1341bfa8fb21a67966c53dd0b2c663d6a5961112063e82
 telebot==0.0.5
 toml==0.10.2
 tomli==2.3.0
