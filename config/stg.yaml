@@ -5,3 +5,7 @@ service:
 user:
   login: "kirka"
   password: "qwerty123"
+
+telegram:
+  chat_id: -1003480570289
+  token: 8393401811:AAGXeKv6UGDlrageDTDBfxCKvtdXmpMGJkQ
